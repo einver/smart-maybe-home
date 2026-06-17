@@ -3,6 +3,8 @@ frontend/node_modules/
 
 .vs/
 .vscode/
+.env
+.env.*
 
 **/bin/
 **/obj/
