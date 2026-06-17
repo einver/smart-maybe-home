@@ -1,0 +1,102 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/api";
+import { Link } from "react-router-dom";
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await api.post("/auth/login", {
+        email,
+        password
+      });
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/");
+    } catch (err: any) {
+      setError(err.response?.data || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="w-full max-w-md bg-indigo-100 gap-3 rounded-3xl p-8 shadow-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-black text-slate-800">
+            Smart Home
+          </h1>
+
+          <p className="text-slate-600 mt-2">
+            Контроль вашей системы автоматизации
+          </p>
+        </div>
+
+        <div className="space-y-5">
+          <div>
+            <label className="block text-slate-800 mb-2">
+              Почта
+            </label>
+
+            <input
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500"
+              placeholder="example@mail.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-800 mb-2">
+              Пароль
+            </label>
+
+            <input
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500"
+              placeholder="••••••••"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 transition rounded-xl py-3 text-slate-950 font-semibold"
+          >
+            {loading ? "Loading..." : "Login"}
+          </button>
+          <div className="text-center text-sm text-slate-600">
+            Ещё нет аккаунта?{" "}
+            <Link
+              to="/register"
+              className="text-cyan-600 font-semibold hover:underline"
+            >
+              Зарегистрироваться
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
