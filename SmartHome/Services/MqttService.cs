@@ -35,13 +35,20 @@ public class MqttService : BackgroundService
             await HandleMessage(e);
         };
 
-        await _client.ConnectAsync(options, stoppingToken);
+        try
+        {
+            await _client.ConnectAsync(options, stoppingToken);
 
-        await _client.SubscribeAsync("smarthome/#");
+            await _client.SubscribeAsync("smarthome/#");
+            await _client.SubscribeAsync("zigbee2mqtt/#");
 
-        await _client.SubscribeAsync("zigbee2mqtt/#");
-
-        Console.WriteLine("MQTT connected");
+            Console.WriteLine("MQTT connected");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"MQTT unavailable: {ex.Message}");
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
