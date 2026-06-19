@@ -108,6 +108,7 @@ builder.Services.AddCors(options =>
         {
             policy
                 //.WithOrigins("http://localhost:5173")
+                .WithOrigins("https://smart-home-maybe.onrender.com/")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
