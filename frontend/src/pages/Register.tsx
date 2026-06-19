@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/api";
 
 export default function Register() {
-  const [name, _setName] = useState("");
+  // const [name, _setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,7 +18,7 @@ export default function Register() {
       setError("");
 
       await api.post("/auth/register", {
-        name,
+        // name,
         email,
         password
       });
