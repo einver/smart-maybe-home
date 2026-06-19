@@ -58,9 +58,9 @@ export default function ScenarioTemplates() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [roomId, setRoomId] = useState("");
-  const aliases: Record<string, string[]> = {
-    motion: ["motion", "occupancy"]
-  };
+  // const aliases: Record<string, string[]> = {
+  //   motion: ["motion", "occupancy"]
+  // };
 
   useEffect(() => {
     loadData();
