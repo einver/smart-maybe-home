@@ -11,7 +11,7 @@ import type {
 
 // универсальный парсер
 export function parseDeviceState<T extends DeviceType>(
-  // _type: T,
+  _type: T,
   json: string
 ): DeviceStateMap[T] | null {
   try {
