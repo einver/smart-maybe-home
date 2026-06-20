@@ -15,9 +15,14 @@ public class MqttService : BackgroundService
 
     private IMqttClient _client = null!;
 
-    public MqttService(IServiceScopeFactory scopeFactory)
+    private readonly IConfiguration _configuration;
+
+    public MqttService(
+    IServiceScopeFactory scopeFactory,
+    IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
+        _configuration = configuration;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,8 +31,22 @@ public class MqttService : BackgroundService
 
         _client = factory.CreateMqttClient();
 
+        var mqttHost =
+         _configuration["Mqtt:Host"];
+
+        var mqttPort =
+            _configuration.GetValue<int>("Mqtt:Port");
+
+        if (string.IsNullOrWhiteSpace(mqttHost))
+        {
+            Console.WriteLine(
+                "MQTT disabled");
+
+            return;
+        }
+
         var options = new MqttClientOptionsBuilder()
-            .WithTcpServer("localhost", 1883)
+            .WithTcpServer(mqttHost, mqttPort)
             .Build();
 
         _client.ApplicationMessageReceivedAsync += async e =>
