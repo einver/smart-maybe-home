@@ -87,12 +87,20 @@ function App() {
 
           <Route
             path="/scenario-templates"
-            element={<ScenarioTemplates />}
+            element={
+              <PrivateRoute>
+                <ScenarioTemplates />
+              </PrivateRoute>
+            }
           />
 
           <Route
             path="/TelegramSettings"
-            element={<TelegramSettings/>}
+            element={
+              <PrivateRoute>
+                <TelegramSettings/>
+              </PrivateRoute>
+            }
           />
 
           <Route

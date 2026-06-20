@@ -23,7 +23,14 @@ export default function Register() {
         password
       });
 
-      navigate("/login");
+      const res = await api.post("/auth/login", {
+        email,
+        password
+      });
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/");
     } catch (err: any) {
       setError(
         err.response?.data ??
