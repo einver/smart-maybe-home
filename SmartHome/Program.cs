@@ -7,9 +7,12 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Net.Sockets;
 using System.Net;
-
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load();
+builder.Configuration.AddEnvironmentVariables();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
