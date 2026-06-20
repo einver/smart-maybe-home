@@ -69,44 +69,5 @@ namespace SmartHome.Controllers
 
             return Ok();
         }
-
-        [HttpGet("test-telegram")]
-        public async Task<IActionResult> TestTelegram(
-            [FromServices] TelegramBotService telegram)
-        {
-            await telegram.SendMessage(
-                738240361,
-                "SmartHome test message");
-
-            return Ok();
-        }
-        [HttpGet("telegram-test")]
-        public async Task<IActionResult> TelegramTest()
-        {
-            using var client = new HttpClient();
-
-            var response = await client.GetAsync(
-                "https://www.google.com");
-
-            return Ok(response.StatusCode);
-        }
-        [HttpGet("telegram-ipv4-test")]
-        public async Task<IActionResult> Test()
-        {
-            using var client = new HttpClient();
-
-            var ipv4 = await client.GetStringAsync("https://api.ipify.org");
-
-            return Ok(ipv4);
-        }
-        [HttpGet("telegram-direct")]
-        public async Task<IActionResult> TelegramDirect()
-        {
-            using var client = new HttpClient();
-
-            var r = await client.GetAsync("https://api.telegram.org");
-
-            return Ok(await r.Content.ReadAsStringAsync());
-        }
     }
 }
