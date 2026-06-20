@@ -21,7 +21,7 @@ namespace SmartHome.Controllers
             var token = await _authService.Register(dto.Email, dto.Password);
 
             if (token == null)
-                return BadRequest("User already exists");
+                return BadRequest("Что-то пошло не так");
 
             return Ok(new { token });
         }
@@ -32,7 +32,7 @@ namespace SmartHome.Controllers
             var token = _authService.Login(dto.Email, dto.Password);
 
             if (token == null)
-                return Unauthorized("Invalid credentials");
+                return Unauthorized("Неверно введён логин или пароль");
 
             return Ok(new { token });
         }
