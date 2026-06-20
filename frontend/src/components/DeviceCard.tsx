@@ -86,6 +86,73 @@ function DeviceCard({
     rooms.find(r => r.id === roomId)?.name ||
     "Unknown";
 
+  const isVirtualSensor =
+    d.connectionType === "Virtual" &&
+    isSensorState(d.type, state);
+  
+  const sensorState = isSensorState(d.type, state)
+    ? state
+    : null;
+
+  const addSensorField = (
+    field:
+      | "temperature"
+      | "humidity"
+      | "motion"
+      | "occupancy"
+      | "illuminance"
+      | "battery"
+  ) => {
+    if (!sensorState) return;
+
+    const updated = { ...sensorState };
+
+    switch (field) {
+      case "temperature":
+        updated.temperature = 20;
+        break;
+
+      case "humidity":
+        updated.humidity = 50;
+        break;
+
+      case "motion":
+        updated.motion = false;
+        break;
+
+      case "occupancy":
+        updated.occupancy = false;
+        break;
+
+      case "illuminance":
+        updated.illuminance = 300;
+        break;
+
+      case "battery":
+        updated.battery = 100;
+        break;
+    }
+
+    updateState(d, updated);
+  };
+
+  const removeSensorField = (
+    field:
+    | "temperature"
+    | "motion"
+    | "occupancy"
+    | "illuminance"
+    | "battery"
+  ) => {
+    if (!sensorState) return;
+
+    const updated = { ...sensorState };
+
+    delete updated[field];
+
+    updateState(d, updated);
+  };
+
   return (
     <div
       className={` glass-card
@@ -375,22 +442,104 @@ function DeviceCard({
 
       {isSensorState(d.type, state) && (
         <div className="space-y-5 overflow-y-auto pr-1">
+          {isVirtualSensor && (
+            <div className="rounded-3xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-cyan-50 p-5">
+              <div className="mb-3 font-semibold text-indigo-700">
+                Управление данными датчика
+              </div>
+
+              <select
+                className="
+                  w-full
+                  rounded-2xl
+                  border
+                  border-indigo-200
+                  bg-white
+                  p-3
+                  font-medium
+                  text-slate-700
+                  shadow-sm
+                "
+                onChange={e => {
+                  if (e.target.value)
+                    addSensorField(e.target.value as any);
+
+                  e.target.value = "";
+                }}
+              >
+                <option value="">
+                  ➕ Добавить параметр
+                </option>
+
+                <option value="temperature">
+                  Температура
+                </option>
+
+                <option value="motion">
+                  Движение
+                </option>
+
+                <option value="illuminance">
+                  Освещённость
+                </option>
+
+                <option value="battery">
+                  Батарея
+                </option>
+              </select>
+            </div>
+          )}
           {state.temperature !== undefined && (
             <div className="rounded-3xl bg-slate-50 p-5">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
                   <div className="font-semibold text-slate-700">
                     Температура
                   </div>
+                  
 
                   <div className="text-sm text-slate-500">
                     Данные в реальном времени
                   </div>
                 </div>
+                {isVirtualSensor && (
+                  <button
+                    className="
+                      rounded-xl
+                      bg-red-50
+                      px-3
+                      py-2
+                      text-sm
+                      font-semibold
+                      text-red-500
+                      transition
+                      hover:bg-red-100
+                    "
+                    onClick={() =>
+                      removeSensorField("temperature")
+                    }
+                  >
+                    ✕
+                  </button>
+                )}
 
-                <span className="text-4xl font-black text-indigo-600">
-                  {state.temperature}°
-                </span>
+                {isVirtualSensor ? (
+                  <input
+                    type="number"
+                    value={state.temperature}
+                    className="w-24 rounded-xl border p-2 text-center text-2xl font-black text-indigo-600"
+                    onChange={e =>
+                      updateState(d, {
+                        ...state,
+                        temperature: Number(e.target.value)
+                      })
+                    }
+                  />
+                ) : (
+                  <span className="text-4xl font-black text-indigo-600">
+                    {state.temperature}°
+                  </span>
+                )}
               </div>
 
               <div className="h-[220px]">
@@ -401,15 +550,57 @@ function DeviceCard({
 
           {state.motion !== undefined && (
             <div
-              className={`rounded-3xl p-5 text-center text-lg font-bold ${
+              className={`rounded-3xl p-5 text-center ${
                 state.motion
-                  ? "bg-emerald-100 text-emerald-600"
-                  : "bg-slate-100 text-slate-500"
+                  ? "bg-emerald-100"
+                  : "bg-slate-100"
               }`}
             >
-              {state.motion
-                ? "🟢 Зафиксировано движение"
-                : "🛑 Движений нет"}
+              <div className="mb-3 text-lg font-bold">
+                {state.motion
+                  ? "🟢 Зафиксировано движение"
+                  : "🛑 Движений нет"}
+              </div>
+
+              {isVirtualSensor && (
+                <button
+                  className="
+                    rounded-xl
+                    bg-white
+                    px-4
+                    py-2
+                    font-medium
+                    shadow-sm
+                  "
+                  onClick={() =>
+                    updateState(d, {
+                      ...state,
+                      motion: !state.motion
+                    })
+                  }
+                >
+                  Переключить
+                </button>
+              )}
+
+              {isVirtualSensor && (
+                <button
+                  className="
+                    ml-2
+                    rounded-xl
+                    bg-red-50
+                    px-4
+                    py-2
+                    font-medium
+                    text-red-500
+                  "
+                  onClick={() =>
+                    removeSensorField("motion")
+                  }
+                >
+                  Удалить
+                </button>
+              )}
             </div>
           )}
 
@@ -424,33 +615,120 @@ function DeviceCard({
               {state.occupancy
                 ? "🟢 Зафиксировано движение"
                 : "🛑 Движений нет"}
+
+              {/* {isVirtualSensor && (
+                <button
+                  className="rounded-xl bg-white px-4 py-2"
+                  onClick={() =>
+                    updateState(d, {
+                      ...state,
+                      occupancy: !state.occupancy
+                    })
+                  }
+                >
+                  Переключить
+                </button>
+              )} */}
             </div>
           )}
 
           {state.illuminance !== undefined && (
             <div className="rounded-3xl bg-slate-50 p-5">
-              <div className="text-sm text-slate-500">
-                Освещённость
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  Освещённость
+                </div>
+
+                {isVirtualSensor && (
+                  <button
+                    className="
+                      rounded-xl
+                      bg-red-50
+                      px-3
+                      py-1
+                      text-sm
+                      font-semibold
+                      text-red-500
+                    "
+                    onClick={() =>
+                      removeSensorField("illuminance")
+                    }
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
-              <div className="mt-2 text-4xl font-black text-amber-500">
-                {state.illuminance}
-              </div>
+              {isVirtualSensor ? (
+                <input
+                  type="number"
+                  value={state.illuminance}
+                  className="mt-2 w-full rounded-xl border p-2 text-2xl font-black text-amber-500"
+                  onChange={e =>
+                    updateState(d, {
+                      ...state,
+                      illuminance: Number(e.target.value)
+                    })
+                  }
+                />
+              ) : (
+                <div className="mt-2 text-4xl font-black text-amber-500">
+                  {state.illuminance}
+                </div>
+              )}
 
               <div className="text-sm text-slate-400">
                 lux
               </div>
             </div>
           )}
+
           {state.battery !== undefined && (
             <div className="rounded-3xl bg-slate-50 p-5">
-              <div className="text-sm text-slate-500">
-                Заряд батареи
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  Заряд батареи
+                </div>
+
+                {isVirtualSensor && (
+                  <button
+                    className="
+                      rounded-xl
+                      bg-red-50
+                      px-3
+                      py-1
+                      text-sm
+                      font-semibold
+                      text-red-500
+                    "
+                    onClick={() =>
+                      removeSensorField("battery")
+                    }
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
-              <div className="mt-2 text-4xl font-black text-green-600">
-                {state.battery}%
-              </div>
+              {isVirtualSensor ? (
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={state.battery}
+                  className="mt-2 w-full rounded-xl border p-2 text-2xl font-black text-green-600"
+                  onChange={e =>
+                    updateState(d, {
+                      ...state,
+                      battery: Number(e.target.value)
+                    })
+                  }
+                />
+              ) : (
+                <div className="mt-2 text-4xl font-black text-green-600">
+                  {state.battery}%
+                </div>
+              )}
             </div>
           )}
         </div>
